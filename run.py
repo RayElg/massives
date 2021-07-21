@@ -119,7 +119,7 @@ while True:
                 print("Ticks: {}", ticksPerLoop)
             elif e.key == pygame.K_d:
                 ticksPerLoop = min(16384, ticksPerLoop * 2)
-                print("Ticks: {}", ticksPerLoop)
+                print("Ticks: ", ticksPerLoop)
             elif e.key == pygame.K_UP:
                 offset_y_vel = 2 * zoom
             elif e.key == pygame.K_DOWN:
