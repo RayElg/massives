@@ -116,7 +116,7 @@ while True:
                 zoom = zoom / 0.8
             elif e.key == pygame.K_a:
                 ticksPerLoop = max(1, ticksPerLoop // 2)
-                print("Ticks: {}", ticksPerLoop)
+                print("Ticks: ", ticksPerLoop)
             elif e.key == pygame.K_d:
                 ticksPerLoop = min(16384, ticksPerLoop * 2)
                 print("Ticks: ", ticksPerLoop)
