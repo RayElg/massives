@@ -1,13 +1,29 @@
 #[no_mangle]
-pub unsafe extern fn tick(massives: *const Massive, len: usize)->Result{ //Performs one step of the simulation
-    
-    let mut massives = core::slice::from_raw_parts(massives, len).to_vec().to_owned(); //Unsafe code: take length and pointer to area of memory and construct the massives vector from it
+pub extern fn tick(massives_pointer: *const Massive, len: usize)->Result{ //Performs one step of the simulation
+    unsafe {
+        let massives = core::slice::from_raw_parts(massives_pointer, len).to_vec(); //Unsafe code: take length and pointer to area of memory and construct the massives vector from it
 
-    let mut to_remove = vec![]; //Declare empty vectors for handling collided massives
-    let mut to_push = vec![];
+        if len > 0 {
+            if massives[0].pos_x.is_nan() { //We have NAN value after making slice and vector. Won't catch all issues but should catch soke
+                return Result {
+                    pointer: massives_pointer,
+                    length: len,
+                    is_broken: true //Broken data indicator. Driver script should reload data
+                }
+            }
+        }
 
-    for i_p in 0..len{ //Iterate through each pair of massive
-        for j_p in 0..len{
+        tick_vec(massives)
+    }
+
+}
+
+pub fn tick_vec(mut massives: Vec<Massive>)-> Result{ //Executed from unsafe block, but at least shouldn't be unsafe code if the vector is fine
+    let mut to_remove = Vec::new(); //Declare empty vectors for handling collided massives
+    let mut to_push = Vec::new();
+
+    for i_p in 0..massives.len(){ //Iterate through each pair of massive
+        for j_p in 0..massives.len(){
             if i_p != j_p{
                 let j = massives[j_p];
                 let mut i = &mut massives[i_p];
@@ -72,6 +88,7 @@ pub unsafe extern fn tick(massives: *const Massive, len: usize)->Result{ //Perfo
     }
 
     Result{pointer: massives.as_mut_ptr(), length: massives.len(), is_broken: has_nan} //Return deconstructed slice and broken data indicator
+
 }
 
 pub extern fn collide(massive1: &Massive, massive2: &Massive)->Massive{ //Takes 2 massives, calculates resulting massive
